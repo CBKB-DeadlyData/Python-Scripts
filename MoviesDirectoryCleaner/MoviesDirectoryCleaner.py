@@ -1,24 +1,28 @@
 import os
 import shutil
 
-movies_directory = "/deadlydata/private/Torrents/Movies"
-movies_file = "movies.txt"
-deleted_file = "deleted.txt"
+# Read movies.txt
+with open('movies.txt', 'r') as f:
+    movies_to_delete = f.read().splitlines()
 
-# Read the movie names from the file
-with open(movies_file, "r") as file:
-    movie_names = file.read().splitlines()
+# Path to the directory containing movie folders
+path = '/media/sdx1/deadlydata/private/Torrents/Movies'
 
-# Iterate over the movie names and delete matching folders
-deleted_folders = []
-for movie_name in movie_names:
-    movie_directory = os.path.join(movies_directory, movie_name)
-    if os.path.exists(movie_directory) and os.path.isdir(movie_directory):
-        print("Deleting folder: {}".format(movie_directory))
-        shutil.rmtree(movie_directory, ignore_errors=True, onerror=lambda *args: None)
-        deleted_folders.append(movie_name)
+# Prepare a list for deleted movies
+deleted_movies = []
 
-# Write the deleted folder names to the file
-with open(deleted_file, "w") as file:
-    for folder_name in deleted_folders:
-        file.write(folder_name + "\n")
+# Iterate over each movie folder in the path
+for movie in os.listdir(path):
+    # If the movie folder is in the list of movies to delete
+    if movie in movies_to_delete:
+        # Full path to the movie folder
+        full_path = os.path.join(path, movie)
+        # Delete the movie folder
+        shutil.rmtree(full_path)
+        # Add the movie to the list of deleted movies
+        deleted_movies.append(movie)
+
+# Write deleted movies to removed.txt
+with open('removed.txt', 'w') as f:
+    for movie in deleted_movies:
+        f.write("{}\n".format(movie))
